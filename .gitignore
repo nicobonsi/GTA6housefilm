@@ -1,0 +1,10 @@
+# Photos/video of real people and your house stay off GitHub by default.
+# Remove a line only if you are sure (and the repo is private).
+characters/*/*
+locations/*/*
+renders/*/*
+music/*
+output/*
+!.gitkeep
+__pycache__/
+.DS_Store

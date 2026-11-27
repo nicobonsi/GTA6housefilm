@@ -1,0 +1,68 @@
+# Single source of truth for the film.
+# Edit this file, then run:  python scripts/build_prompts.py
+# Every shot references a location id and character ids defined below.
+
+title: "HOUSE PARTY"          # shown on the opening title card
+tagline: "Coming soon"        # shown on the closing card
+aspect: "16:9"                # "16:9" (YouTube/TV) or "9:16" (phone/Reels/TikTok)
+fps: 24
+
+# Global look. Prepended to every image prompt so every shot matches.
+# Describe the look in your own words; don't paste a game's logos or names.
+style: >
+  stylized cinematic key art, semi-realistic painted illustration,
+  saturated sunset palette of hot pink, orange and teal, strong rim light,
+  crisp ink outlines, high contrast, crime-saga movie trailer aesthetic,
+  35mm anamorphic framing, slight film grain
+
+negative: >
+  text, watermark, logo, extra fingers, distorted faces, blurry, low detail
+
+characters:
+  - id: hero
+    name: "NAME 1"
+    refs: characters/hero/          # put 3-10 photos of this person here
+    look: "late 30s, short dark hair, stubble, white linen shirt, gold watch"
+  - id: partner
+    name: "NAME 2"
+    refs: characters/partner/
+    look: "early 30s, long wavy hair, sunglasses on head, red summer dress"
+
+locations:
+  - id: front
+    name: "Front of the house"
+    refs: locations/front/          # photos/video of this place
+    description: "two-storey white house, palm tree, driveway, dusk"
+  - id: living
+    name: "Living room"
+    refs: locations/living/
+    description: "open living room, big sofa, floor-to-ceiling windows"
+  - id: pool
+    name: "Pool / garden"
+    refs: locations/pool/
+    description: "backyard pool with string lights, loungers"
+
+# Shot list. Keep shots 3-6 s each; a trailer is ~20-30 shots / 60-90 s.
+# card: optional text card shown BEFORE the shot (trailer-style interstitial).
+shots:
+  - id: s01
+    location: front
+    characters: []
+    action: "slow aerial push-in on the house at golden hour"
+    camera: "drone, slow dolly forward"
+    seconds: 4
+    card: null
+  - id: s02
+    location: living
+    characters: [hero]
+    action: "hero turns to camera and lowers his sunglasses, smirking"
+    camera: "medium close-up, slow push-in"
+    seconds: 4
+    card: "SATURDAY NIGHT"
+  - id: s03
+    location: pool
+    characters: [hero, partner]
+    action: "both raise glasses for a toast as fireworks burst behind them"
+    camera: "wide shot, slow orbit"
+    seconds: 5
+    card: null
