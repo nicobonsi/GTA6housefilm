@@ -209,6 +209,8 @@ class Hud:
         d.text((tx, y + self.s(12)), label, font=fl, fill=color + (A,))
         d.text((tx, y + self.s(36)), ev["text"], font=ft, fill=(255, 255, 255, A))
         ix = int(ox)
+        if -ix >= layer.width:  # still fully off-screen
+            return
         if ix < 0:  # sliding in from off-screen
             layer = layer.crop((-ix, 0, layer.width, layer.height))
             ix = 0

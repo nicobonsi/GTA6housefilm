@@ -73,6 +73,9 @@ python scripts/twin.py                  # full resolution, once paths look right
 Then write the scenes in `project.yaml`: for each one, the room, the host's
 walking path (points in plan metres), where the guests stand, and the camera.
 Re-run and watch `renders/guides/*.mp4` until every camera move works.
+Tip: the chase camera sits `dist` metres behind the host, so start each walk at
+least that far from the wall behind it (or shorten `dist`), otherwise the first
+frames look at the inside of a wall.
 
 **Watch the free animatic now:** `python scripts/assemble.py` cuts the whole
 film from the clay guides, with the full HUD. Fix the timing here, before
