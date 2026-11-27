@@ -1,1 +1,7 @@
-both raise glasses for a toast as fireworks burst behind them. Camera: wide shot, slow orbit. Duration 5 seconds. Keep the art style, faces and lighting of the start frame exactly; smooth cinematic motion, no morphing, no text.
+Start frame: the attached still. Camera motion: follow the attached grey guide
+video exactly, frame by frame (same path, speed and framing); the guide is only
+for motion and layout, never for colours or textures.
+Action: the host leans on the kitchen island and picks a drink.
+Keep every face identical to the start frame, keep walls and furniture fixed,
+natural walking, party extras moving in the background, no morphing,
+no text or UI. 5 seconds, 24 fps.

@@ -1,0 +1,7 @@
+Start frame: the attached still. Camera motion: follow the attached grey guide
+video exactly, frame by frame (same path, speed and framing); the guide is only
+for motion and layout, never for colours or textures.
+Action: the host and guest two walk down into the garage and find a gleaming silver supercar.
+Keep every face identical to the start frame, keep walls and furniture fixed,
+natural walking, party extras moving in the background, no morphing,
+no text or UI. 6 seconds, 24 fps.

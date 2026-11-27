@@ -1,0 +1,14 @@
+Image 1 is a grey 3D render of a real room. Keep its camera, lens, framing and
+the position of every wall, door, window and piece of furniture exactly. Each
+grey figure in image 1 is a person; put the people listed below exactly there.
+
+Turn it into a finished film frame of the entry hall during a house party.
+Use the room photos for real materials, colours and light fittings.
+Use the people photos for faces; they must be recognisable.
+
+Scene: the host walks in through the front door into the dim entry hall, party light glowing ahead.
+People:
+- HOST (the figure the camera follows, seen from behind/over the shoulder): 40s, tanned, long hair, sunglasses, loud floral short-sleeve shirt and matching shorts. Face and build exactly as in the photos of HOST.
+
+Style: photorealistic cinematic frame, shot on a full-frame camera, warm practical lighting at dusk, pink and teal accent light, shallow depth of field, glossy modern interior, natural skin, crisp detail
+No text, no logos, no UI, no watermark. Aspect ratio 16:9.

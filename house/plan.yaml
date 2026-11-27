@@ -1,0 +1,76 @@
+# The house, as simple rectangles in metres, taken from the floor plans.
+# THIS IS A DEMO HOUSE. Replace it with yours (see house/README.md).
+#
+# rect: [x, y, width, depth]  - x to the right, y up the page, origin = a corner of the plot
+# openings sit on a room's wall: n (top, y+depth), s (bottom, y), e (right), w (left)
+#   offset = metres from the wall's start (left end for n/s, bottom end for e/w)
+#   doors default to bottom 0, top 2.1; give bottom/top for windows
+#   a door between two rooms must be cut in BOTH rooms' walls
+# outdoor: true -> ground only, no walls or ceiling (garden, pool, terrace)
+
+wall_height: 2.7
+wall_thickness: 0.12
+
+floors:              # listed top to bottom, as the minimap shows them
+  - {id: l1, name: "1", z: 3.0}
+  - {id: g, name: "G", z: 0.0}
+  - {id: garage, name: "GARAGE", z: -3.0}
+
+rooms:
+  - id: entry
+    name: Entry hall
+    floor: g
+    rect: [0, 0, 3, 4]
+    openings:
+      - {wall: s, offset: 1.0, width: 1.0}            # front door
+      - {wall: e, offset: 1.5, width: 1.0}            # to living
+      - {wall: n, offset: 1.0, width: 0.9}            # to kitchen
+  - id: living
+    name: Living room
+    floor: g
+    rect: [3, 0, 7, 6]
+    openings:
+      - {wall: w, offset: 1.5, width: 1.0}            # from entry
+      - {wall: n, offset: 1.0, width: 4.0}            # glass slider to pool
+      - {wall: e, offset: 1.0, width: 3.5, bottom: 0.4, top: 2.4}   # window
+  - id: kitchen
+    name: Kitchen
+    floor: g
+    rect: [0, 4, 3, 4]
+    openings:
+      - {wall: s, offset: 1.0, width: 0.9}
+      - {wall: w, offset: 1.0, width: 2.0, bottom: 1.0, top: 2.2}
+  - id: pool
+    name: Pool terrace
+    floor: g
+    rect: [3, 6, 7, 5]
+    outdoor: true
+  - id: bedroom
+    name: Main bedroom
+    floor: l1
+    rect: [0, 0, 5, 5]
+    openings:
+      - {wall: e, offset: 1.0, width: 0.8}
+      - {wall: s, offset: 1.0, width: 3.0, bottom: 0.6, top: 2.3}
+  - id: bathroom
+    name: Main bathroom
+    floor: l1
+    rect: [5, 0, 3, 3]
+    openings:
+      - {wall: w, offset: 1.0, width: 0.8}
+  - id: garage
+    name: Garage
+    floor: garage
+    rect: [0, 0, 7, 7]
+    openings:
+      - {wall: s, offset: 1.0, width: 5.0, top: 2.3}
+
+# Furniture as boxes. Enough for the AI to put the sofa where the sofa is.
+props:
+  - {room: living, name: sofa, rect: [6.0, 3.5, 3.0, 0.9], h: 0.8}
+  - {room: living, name: tv, rect: [6.5, 0.2, 2.0, 0.1], h: 1.1, z: 0.6}
+  - {room: kitchen, name: island, rect: [0.6, 5.6, 1.6, 0.9], h: 0.95}
+  - {room: pool, name: pool, rect: [4.0, 8.0, 5.0, 2.5], h: 0.05}
+  - {room: bedroom, name: bed, rect: [1.0, 1.5, 2.0, 2.2], h: 0.6}
+  - {room: bathroom, name: bath, rect: [5.5, 1.9, 1.8, 0.8], h: 0.6}
+  - {room: garage, name: car, rect: [1.2, 1.5, 2.0, 4.6], h: 1.25}

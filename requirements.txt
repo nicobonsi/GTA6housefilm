@@ -1,1 +1,3 @@
 pyyaml>=6
+pillow>=10.1
+# for scripts/twin.py: pip install bpy  (or use the Blender app)

@@ -1,68 +1,128 @@
-# Single source of truth for the film.
-# Edit this file, then run:  python scripts/build_prompts.py
-# Every shot references a location id and character ids defined below.
+# The film. Single source of truth: characters, scenes, HUD events.
+# The house itself lives in house/plan.yaml. Scene paths use its coordinates.
+#
+# After editing:  python scripts/build_prompts.py
+# Clay guides:    python scripts/twin.py           (needs bpy or Blender)
+# Film:           python scripts/assemble.py
 
-title: "HOUSE PARTY"          # shown on the opening title card
-tagline: "Coming soon"        # shown on the closing card
-aspect: "16:9"                # "16:9" (YouTube/TV) or "9:16" (phone/Reels/TikTok)
+title: "ULTIMATE PARTY"          # big title card (or put your own art at brand/title.png)
+subtitle: "THE HOUSE EDITION"
+title_after: s01                 # title card goes right after this scene
+end_text: "MISSION COMPLETE"
+end_subtitle: "THE ULTIMATE PARTY · RESPECT +"
+aspect: "16:9"                   # or "9:16" for phones
 fps: 24
 
-# Global look. Prepended to every image prompt so every shot matches.
-# Describe the look in your own words; don't paste a game's logos or names.
+# Look of the AI stills and video. Their film is photoreal; the game feel
+# comes from the HUD, the cards and the edit, not from a painted style.
 style: >
-  stylized cinematic key art, semi-realistic painted illustration,
-  saturated sunset palette of hot pink, orange and teal, strong rim light,
-  crisp ink outlines, high contrast, crime-saga movie trailer aesthetic,
-  35mm anamorphic framing, slight film grain
+  photorealistic cinematic frame, shot on a full-frame camera, warm practical
+  lighting at dusk, pink and teal accent light, shallow depth of field,
+  glossy modern interior, natural skin, crisp detail
 
-negative: >
-  text, watermark, logo, extra fingers, distorted faces, blurry, low detail
+# The cast. refs = folder of real photos (3-10 per person).
+# card = the freeze-frame intro card: portrait art goes in characters/<id>/card.png
+cast:
+  - id: host
+    name: "HOST"
+    refs: characters/host/
+    look: "40s, tanned, long hair, sunglasses, loud floral short-sleeve shirt and matching shorts"
+    card: null                    # the host gets no intro card
+  - id: guest1
+    name: "GUEST ONE"
+    refs: characters/guest1/
+    look: "30s, blonde, black slip dress"
+    card: {title: "GUEST ONE", subtitle: "CHAMPAGNE SERVICE"}
+  - id: guest2
+    name: "GUEST TWO"
+    refs: characters/guest2/
+    look: "50s, grey hair, band t-shirt, black jeans"
+    card: {title: "GUEST TWO", subtitle: "LOCAL LEGEND"}
 
-characters:
-  - id: hero
-    name: "NAME 1"
-    refs: characters/hero/          # put 3-10 photos of this person here
-    look: "late 30s, short dark hair, stubble, white linen shirt, gold watch"
-  - id: partner
-    name: "NAME 2"
-    refs: characters/partner/
-    look: "early 30s, long wavy hair, sunglasses on head, red summer dress"
-
-locations:
-  - id: front
-    name: "Front of the house"
-    refs: locations/front/          # photos/video of this place
-    description: "two-storey white house, palm tree, driveway, dusk"
-  - id: living
-    name: "Living room"
-    refs: locations/living/
-    description: "open living room, big sofa, floor-to-ceiling windows"
-  - id: pool
-    name: "Pool / garden"
-    refs: locations/pool/
-    description: "backyard pool with string lights, loungers"
-
-# Shot list. Keep shots 3-6 s each; a trailer is ~20-30 shots / 60-90 s.
-# card: optional text card shown BEFORE the shot (trailer-style interstitial).
-shots:
+# Scenes, in film order. One scene = one room = one AI clip (keep 4-8 s).
+#   path:   where the host walks, [x, y] waypoints in plan metres
+#   place:  where the others stand, [x, y] or [x, y, facing_degrees]
+#   camera: chase (behind host) | lead (in front, facing back) | static (pos/look)
+#   cash:   value the counter rolls up to at the start of the scene
+#   music:  open (in the room with the party) | muffled (hallway, outside)
+#   events (at = seconds into the scene's clip):
+#     card  - freeze, black & white, character card slides in   {who, hold}
+#     wheel - freeze, drinks wheel, one item picked              {items, pick, hold}
+#     toast - game notification, top-left                        {kind: achievement|warning|vehicle, label, text}
+#     text  - centred text over the shot                         {text, seconds}
+scenes:
   - id: s01
-    location: front
-    characters: []
-    action: "slow aerial push-in on the house at golden hour"
-    camera: "drone, slow dolly forward"
-    seconds: 4
-    card: null
-  - id: s02
-    location: living
-    characters: [hero]
-    action: "hero turns to camera and lowers his sunglasses, smirking"
-    camera: "medium close-up, slow push-in"
-    seconds: 4
-    card: "SATURDAY NIGHT"
-  - id: s03
-    location: pool
-    characters: [hero, partner]
-    action: "both raise glasses for a toast as fireworks burst behind them"
-    camera: "wide shot, slow orbit"
+    room: entry
+    cast: [host]
+    action: "the host walks in through the front door into the dim entry hall, party light glowing ahead"
+    path: [[1.5, -1.2], [1.5, 2.0], [2.5, 2.0]]
+    camera: {mode: chase, dist: 2.3, height: 1.7, lens: 24}
     seconds: 5
-    card: null
+    cash: 0
+    music: muffled
+    events:
+      - {type: text, at: 0.4, text: "NAME PRESENTS", seconds: 2.5}
+
+  - id: s02
+    room: living
+    cast: [host, guest1]
+    action: "the host strolls into the packed living room; guest one walks up with a tray of champagne flutes"
+    path: [[3.2, 2.0], [5.0, 2.2], [6.5, 2.6]]
+    place: {guest1: [8.0, 2.8]}
+    camera: {mode: chase, dist: 2.4, height: 1.7, lens: 24}
+    seconds: 5
+    cash: 250
+    music: open
+    events:
+      - {type: card, at: 3.2, who: guest1, hold: 2.0}
+
+  - id: s03
+    room: kitchen
+    cast: [host]
+    action: "the host leans on the kitchen island and picks a drink"
+    path: [[1.45, 3.2], [1.45, 4.9], [2.4, 5.2]]
+    camera: {mode: chase, dist: 2.0, height: 1.65, lens: 24}
+    seconds: 5
+    cash: 1000
+    music: open
+    events:
+      - {type: wheel, at: 3.5, items: ["BEER", "MARTINI", "OLD FASHIONED", "SHOT", "WINE", "WATER"], pick: "OLD FASHIONED", hold: 1.8}
+
+  - id: s04
+    room: pool
+    cast: [host, guest2]
+    action: "the host steps out to the pool terrace at dusk, guests floating on inflatables, string lights"
+    path: [[5.0, 4.8], [5.8, 7.2], [7.0, 7.6]]
+    place: {guest2: [8.8, 7.6]}
+    camera: {mode: chase, dist: 2.6, height: 1.8, lens: 24}
+    seconds: 6
+    cash: 5000
+    music: open
+    events:
+      - {type: card, at: 4.0, who: guest2, hold: 2.0}
+      - {type: toast, at: 1.0, kind: achievement, label: "ACHIEVEMENT UNLOCKED", text: "POOL PARTY"}
+
+  - id: s05
+    room: bedroom
+    cast: [host]
+    action: "the host walks into the main bedroom upstairs and finds something suspicious under the bed"
+    path: [[4.4, 0.6], [4.2, 3.0], [3.4, 4.2]]
+    camera: {mode: chase, dist: 2.2, height: 1.7, lens: 24}
+    seconds: 5
+    cash: 50000
+    music: muffled
+    events:
+      - {type: toast, at: 2.0, kind: warning, label: "WARNING", text: "THREAT DETECTED"}
+
+  - id: s06
+    room: garage
+    cast: [host, guest2]
+    action: "the host and guest two walk down into the garage and find a gleaming silver supercar"
+    path: [[5.5, 0.6], [5.0, 3.0], [4.2, 4.5]]
+    place: {guest2: [2.2, 6.6]}
+    camera: {mode: chase, dist: 2.6, height: 1.6, lens: 24}
+    seconds: 6
+    cash: 1000000
+    music: open
+    events:
+      - {type: toast, at: 2.5, kind: vehicle, label: "VEHICLE ACQUIRED", text: "SILVER SUPERCAR"}

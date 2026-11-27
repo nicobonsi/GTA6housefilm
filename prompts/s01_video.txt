@@ -1,1 +1,7 @@
-slow aerial push-in on the house at golden hour. Camera: drone, slow dolly forward. Duration 4 seconds. Keep the art style, faces and lighting of the start frame exactly; smooth cinematic motion, no morphing, no text.
+Start frame: the attached still. Camera motion: follow the attached grey guide
+video exactly, frame by frame (same path, speed and framing); the guide is only
+for motion and layout, never for colours or textures.
+Action: the host walks in through the front door into the dim entry hall, party light glowing ahead.
+Keep every face identical to the start frame, keep walls and furniture fixed,
+natural walking, party extras moving in the background, no morphing,
+no text or UI. 5 seconds, 24 fps.

@@ -1,101 +1,116 @@
 # GTA6 House Film
 
-A trailer-style short film set in our own house, starring our own people, in a
-stylized open-world crime-saga look: neon sunset palette, painted key art,
-title cards between shots, one big music track.
+A game-trailer-style party film of our real house, starring our real people:
+third-person camera following the host room by room, with a minimap, a cash
+counter, freeze-frame character cards, a drinks wheel, achievement toasts and
+"MISSION COMPLETE" at the end.
 
-> **Status:** project skeleton. The two reference links
-> (5warm.ai "house-film" lab and the "GTA6PARTY" video) could not be opened
-> from the setup session, so the pipeline below is the standard
-> reference-photos → AI image → AI video → edit workflow, **not** a copy of
-> theirs. Once the references are readable, compare and adjust.
+Modelled on Swarm Labs' [House film](https://5warm.ai/labs/house-film/)
+(their finished film: about 75 s, 1080×608, 24 fps, about 20 shots).
 
-## How it works
+## Their method, and what this repo automates
+
+| # | Stage | Their tools | Here |
+|---|---|---|---|
+| 1 | Floor plans + about 50 phone photos | phone | `house/plan.yaml`, `locations/`, `characters/` |
+| 2 | 3D twin; a grey "clay" chase-cam video per room | Blender, Cycles | **`scripts/twin.py`**: builds the house from the plan and renders every guide |
+| 3 | AI still from guide frame + cast photos | Gemini 3 Pro Image (Nano Banana Pro) | **`scripts/build_prompts.py`**: exact uploads and prompts per scene |
+| 4 | Motion: still + guide video → clip | Higgsfield, Seedance 2.5 | same sheet; you run it on Higgsfield |
+| 5 | Game-trailer edit: HUD, minimap, cash, drinks wheel, character cards | FilmCraft / EffectCraft (their own) | **`scripts/assemble.py`** + `scripts/hud.py` |
+| 6 | Sound: music muffled in hallways, opening up in rooms; SFX | Fish Audio, ElevenLabs, Whisper | `assemble.py` muffles music per scene and drops SFX on events |
+| 7 | Crew: agents + approval of every paid step | Claude agents | Claude Code in this repo |
+
+The key idea in their method is the **3D guide**. A plain AI video model
+invents rooms that drift and walls that move. Rendering the camera path
+through a model of the actual house first, then giving the AI the guide's
+first frame (for the still) and the guide video (for the motion), keeps the
+real layout.
+
+## Folder map
 
 ```
-your photos ──► stylized start frame per shot ──► 3-6 s video clip per shot ──► assembled trailer
- (people,          (image model + ref photos       (image-to-video model)        (scripts/assemble.py:
-  rooms)            + prompt from project.yaml)                                    cards, music, export)
+project.yaml          the film: cast, scenes, camera paths, HUD events
+house/plan.yaml       the house: floors, rooms, doors, windows, furniture (metres)
+characters/<id>/      photos of each person (+ card.png for the intro card)   [git-ignored]
+locations/<room>/     photos of each room                                     [git-ignored]
+renders/guides/       clay guide videos + first frames (from twin.py)         [git-ignored]
+renders/stills/       AI stills you save                                      [git-ignored]
+renders/clips/        AI clips you save                                       [git-ignored]
+music/  sfx/          one music track; optional sound effects                 [git-ignored]
+output/film.mp4       the film                                                [git-ignored]
+brand/title.png       optional title-card art (else a text title is drawn)
 ```
 
-Everything is driven by **`project.yaml`**: title, look, characters, locations
-and the shot list. Two scripts do the mechanical parts:
+## Setup (once)
 
-| Script | What it does |
-|---|---|
-| `scripts/build_prompts.py` | Turns `project.yaml` into a copy-paste prompt for every shot (`prompts/SHEET.md`, plus one `.txt` per shot). |
-| `scripts/assemble.py` | Takes `renders/clips/<shot>.mp4`, crops to 16:9 or 9:16, adds the title and interstitial cards, lays the music under it and writes `output/film.mp4`. |
+```bash
+pip install -r requirements.txt
+```
 
-The generation itself (image and video models) happens in the providers' web
-apps. That keeps it at zero code and lets you re-roll shots by eye, which you
-will do a lot.
+You also need ffmpeg (on a Mac: `brew install ffmpeg`). For the 3D step you need
+either the `bpy` package (`pip install bpy`, which needs the matching Python
+version: Python 3.13 for bpy 5.3) or the Blender app; then use
+`blender -b -P scripts/twin.py --` in place of `python scripts/twin.py`.
 
 ## Step by step
 
-### 1. Gather references (about 1 hour)
-- `characters/<id>/`: 3-10 photos per person (see `characters/README.md`).
-- `locations/<id>/`: photos and a walk-through video per room (see `locations/README.md`).
-- These folders are git-ignored, so faces and your floor plan don't end up on GitHub.
+### 1. The real house (1-2 h)
+- Floor plans: a photo or PDF of each level, with dimensions if you have them.
+- About 50 phone photos: every room you'll use, from the corners and the doorway, lights on.
+  Tidy first. See `locations/README.md`.
+- 3-10 photos per person. See `characters/README.md`.
 
-### 2. Write the film (about 30 min)
-Edit `project.yaml`:
-- names and outfits in `characters`
-- the rooms you'll use in `locations`
-- the shot list: 20-30 shots of 3-6 s each gives a 60-90 s trailer.
-  The trailer formula: establishing shots of the house → one "character intro"
-  shot per person, each with a name card → escalating party/action shots →
-  a black card → one last gag shot → title.
+### 2. The 3D twin
+Put the plan into `house/plan.yaml`: rooms are rectangles in metres, plus doors,
+windows and big furniture. (The current file is a demo house.) Claude can do
+this from photos of the floor plans; that's the quickest route.
 
-Then:
 ```bash
-pip install -r requirements.txt
+python scripts/twin.py --draft          # quick half-resolution pass
+python scripts/twin.py                  # full resolution, once paths look right
+```
+
+Then write the scenes in `project.yaml`: for each one, the room, the host's
+walking path (points in plan metres), where the guests stand, and the camera.
+Re-run and watch `renders/guides/*.mp4` until every camera move works.
+
+**Watch the free animatic now:** `python scripts/assemble.py` cuts the whole
+film from the clay guides, with the full HUD. Fix the timing here, before
+paying for any AI.
+
+### 3. Stills (Nano Banana Pro or another multi-reference image model)
+```bash
 python scripts/build_prompts.py
 ```
-Open `prompts/SHEET.md`.
+Follow `prompts/SHEET.md` scene by scene: upload the guide's first frame
+**first**, then room photos, then the people's photos, and paste the prompt.
+Check faces against the photos and walls against the guide before moving on.
+Do the character-card portraits from the same sheet.
 
-### 3. Make the start frames (the important step)
-For each shot, give an image model the prompt **plus** the reference photos
-listed for that shot, and save the best result as `renders/frames/<shot>.png`.
+### 4. Motion (Seedance on Higgsfield, or similar)
+Per scene: the still as start frame + the guide video as motion reference +
+the video prompt. Do **one scene as a pilot** before batch-running the rest
+(they capped the price of every paid run and approved each one).
 
-Use a model that takes several reference images and keeps faces consistent.
-As of late 2026 the strong options are Google's Gemini image models, OpenAI's
-image model in ChatGPT, and FLUX Kontext. Confidence: moderate; this field
-changes monthly, so test two of them on shot 2 and keep the winner.
+### 5. Music and sound
+- One track in `music/` (for an original track, Suno or similar; check its licence before posting publicly).
+- `music: muffled` scenes get a low-pass filter and lower volume, like hearing
+  the party from the hallway; `open` scenes get the full mix.
+- Optional effects: add `sfx: sfx/whoosh.wav` to any event.
 
-Tips:
-- First make one **character sheet** per person (front, side, full body in
-  the style) and use that sheet as the reference for all later shots. It
-  locks the look far better than raw photos.
-- Generate 4 variants per shot and pick one. Bad hands or faces mean re-roll,
-  not fix later.
-
-### 4. Animate each frame
-Upload `renders/frames/<shot>.png` to an image-to-video model with
-`prompts/<shot>_video.txt`, and save as `renders/clips/<shot>.mp4`.
-Good options: Kling, Google Veo, Runway, Seedance, Hailuo. Expect to pay for
-credits; at typical late-2026 prices a 25-shot trailer with re-rolls costs
-roughly $30-$100 (confidence: low; check current pricing).
-
-Optional house fly-throughs: scan rooms with a phone Gaussian-splat app
-(Scaniverse, Polycam or Luma), record a camera path through the scan, then
-restyle that clip with a video-to-video model. It's more work, but the camera
-moves are really your house.
-
-### 5. Music
-Drop one track into `music/` (mp3 or wav). An AI music generator such as Suno
-works for an original track; check its licence terms if you'll post publicly.
-
-### 6. Assemble
+### 6. Final cut
 ```bash
-python scripts/assemble.py                    # needs every clip
-python scripts/assemble.py --allow-missing    # rough cut with black placeholders
+python scripts/assemble.py
 ```
-Output is `output/film.mp4`. For finer timing or cutting to the beat, import
-`renders/clips/` into CapCut, DaVinci Resolve or iMovie and use this only for
-rough cuts.
+`output/film.mp4`. Finished clips replace clay guides automatically.
 
-## Notes
-- Keep logos, the game's title treatment and its character names out of the
-  prompts and cards: they're trademarks, and image models produce garbled text
-  anyway. The look carries the reference by itself.
-- `aspect: "9:16"` in `project.yaml` makes a vertical version for Reels or TikTok.
+## Cost and time (estimates; confidence low to moderate)
+- Stills: a few dollars on a paid Gemini or Higgsfield plan.
+- Video: about 20 clips × 5 s, plus re-rolls. Plan on **$50-$150** in
+  Higgsfield or Seedance credits. Check current prices before you start.
+- Time: a weekend for one person, most of it on stills and re-rolls.
+
+## Rules we keep
+- Photos of people and the house never go to GitHub (`.gitignore`).
+- No real game logos, title treatments or character names in prompts or cards.
+  The look sells it, and it avoids trademark trouble if the film is shared.
